@@ -57,7 +57,6 @@ export default function LoginPage() {
             description: "Could not check for an existing user account. Please ensure localStorage is enabled.",
             variant: "destructive",
         });
-        // Allow component to render, login will likely fail if storage is inaccessible
     }
   }, [router, toast]);
 
@@ -75,7 +74,7 @@ export default function LoginPage() {
       const storedCredentialsString = localStorage.getItem(USER_CREDENTIALS_KEY);
       if (!storedCredentialsString) {
         toast({
-          title: "Login Failed",
+          title: "Login Novo Failed",
           description: "No account found. Please set up an account first.",
           variant: "destructive",
         });
@@ -94,7 +93,7 @@ export default function LoginPage() {
         router.replace("/");
       } else {
         toast({
-          title: "Login Failed",
+          title: "Login Novo Failed",
           description: "Invalid username or password.",
           variant: "destructive",
         });
@@ -102,7 +101,7 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       toast({
-        title: "Login Error",
+        title: "Login Novo Error",
         description: "An unexpected error occurred during login. Check credentials or try setting up your account again.",
         variant: "destructive",
       });
@@ -118,7 +117,7 @@ export default function LoginPage() {
             <PiggyBank className="h-10 w-10 text-primary" />
              <h1 className="text-3xl font-bold text-primary">FinanceFlow</h1>
           </div>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Login Novo</CardTitle>
           <CardDescription>
             {userCredentialsExist ? "Enter your credentials to access your account." : "Redirecting to account setup..."}
           </CardDescription>
@@ -154,9 +153,9 @@ export default function LoginPage() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : (
+                  {isLoading ? "Efetuando Login Novo..." : (
                     <>
-                      <LogIn className="mr-2 h-4 w-4" /> Login
+                      <LogIn className="mr-2 h-4 w-4" /> Login Novo
                     </>
                   )}
                 </Button>
