@@ -9,9 +9,11 @@ import BalanceDisplay from "@/components/BalanceDisplay";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionTable from "@/components/TransactionTable";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "@/components/ui/skeleton"; // For loading state
+import { Skeleton } from "@/components/ui/skeleton";
+
+const USER_CREDENTIALS_KEY = "financeFlowUserCredentials";
+const LOGGED_IN_KEY = "isLoggedIn";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -22,20 +24,35 @@ export default function Home() {
   const { toast } = useToast();
 
   useEffect(() => {
+    let loggedIn = false;
+    let credentialsExist = false;
+
     try {
-      const loggedIn = localStorage.getItem("isLoggedIn");
-      if (loggedIn === "true") {
-        setIsAuthenticated(true);
-      } else {
-        router.replace("/login");
-      }
+      loggedIn = localStorage.getItem(LOGGED_IN_KEY) === "true";
+      credentialsExist = !!localStorage.getItem(USER_CREDENTIALS_KEY);
     } catch (error) {
-      console.error("Auth check failed:", error);
-      router.replace("/login"); // Fallback to login on error
-    } finally {
+      console.error("Auth check failed (localStorage access):", error);
+      toast({
+        title: "Access Error",
+        description: "Could not verify login status. Please ensure cookies/localStorage are enabled.",
+        variant: "destructive",
+      });
+      router.replace("/setup-account"); // Fallback if localStorage is inaccessible
       setIsAuthCheckComplete(true);
+      return;
     }
-  }, [router]);
+
+    if (loggedIn) {
+      setIsAuthenticated(true);
+    } else {
+      if (credentialsExist) {
+        router.replace("/login");
+      } else {
+        router.replace("/setup-account");
+      }
+    }
+    setIsAuthCheckComplete(true);
+  }, [router, toast]);
 
   useEffect(() => {
     if (!isAuthenticated || !isAuthCheckComplete) return;
@@ -72,7 +89,6 @@ export default function Home() {
   }, [transactions, isInitialLoadComplete, toast, isAuthenticated, isAuthCheckComplete]);
 
   const balance = useMemo(() => {
-    if (!isAuthenticated) return 0;
     return transactions.reduce((acc, transaction) => {
       if (transaction.type === "income") {
         return acc + transaction.amount;
@@ -80,10 +96,9 @@ export default function Home() {
         return acc - transaction.amount;
       }
     }, 0);
-  }, [transactions, isAuthenticated]);
+  }, [transactions]);
 
   const handleAddTransaction = (data: Omit<Transaction, "id" | "date">) => {
-    if (!isAuthenticated) return;
     const newTransaction: Transaction = {
       ...data,
       id: crypto.randomUUID(),
@@ -98,11 +113,10 @@ export default function Home() {
   };
   
   const sortedTransactions = useMemo(() => {
-    if (!isAuthenticated) return [];
     return [...transactions];
-  }, [transactions, isAuthenticated]);
+  }, [transactions]);
 
-  if (!isAuthCheckComplete) {
+  if (!isAuthCheckComplete || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-4xl space-y-8">
@@ -114,12 +128,6 @@ export default function Home() {
         </div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    // This case should ideally not be reached if redirection works properly
-    // but serves as a fallback.
-    return null; 
   }
 
   return (
