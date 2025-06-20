@@ -74,7 +74,7 @@ export default function LoginPage() {
       const storedCredentialsString = localStorage.getItem(USER_CREDENTIALS_KEY);
       if (!storedCredentialsString) {
         toast({
-          title: "Login Novo Failed",
+          title: "Login Failed",
           description: "No account found. Please set up an account first.",
           variant: "destructive",
         });
@@ -93,7 +93,7 @@ export default function LoginPage() {
         router.replace("/");
       } else {
         toast({
-          title: "Login Novo Failed",
+          title: "Login Failed",
           description: "Invalid username or password.",
           variant: "destructive",
         });
@@ -101,7 +101,7 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       toast({
-        title: "Login Novo Error",
+        title: "Login Error",
         description: "An unexpected error occurred during login. Check credentials or try setting up your account again.",
         variant: "destructive",
       });
@@ -117,7 +117,7 @@ export default function LoginPage() {
             <PiggyBank className="h-10 w-10 text-primary" />
              <h1 className="text-3xl font-bold text-primary">FinanceFlow</h1>
           </div>
-          <CardTitle className="text-2xl">Login Novo</CardTitle>
+          <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
             {userCredentialsExist ? "Enter your credentials to access your account." : "Redirecting to account setup..."}
           </CardDescription>
@@ -153,9 +153,9 @@ export default function LoginPage() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Efetuando Login Novo..." : (
+                  {isLoading ? "Logging in..." : (
                     <>
-                      <LogIn className="mr-2 h-4 w-4" /> Login Novo
+                      <LogIn className="mr-2 h-4 w-4" /> Login
                     </>
                   )}
                 </Button>
